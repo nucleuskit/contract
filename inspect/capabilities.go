@@ -38,9 +38,9 @@ func manifestCapabilityProvider(m manifest.Manifest, capability string) string {
 	}
 	var value any
 	switch capability {
-	case "sql":
+	case capabilitySQL:
 		value = m.Nucleus.SQL[providerConfigKey]
-	case "mongo":
+	case capabilityMongo:
 		value = m.Nucleus.Mongo[providerConfigKey]
 	default:
 		return ""
@@ -85,11 +85,11 @@ func capabilityProvider(capability string, imports []string) string {
 func CapabilityModule(capability string) string {
 	switch capability {
 	case "http":
-		return moduleRuntime + "/http"
+		return moduleRoot + "/http"
 	case "grpc":
-		return moduleRuntime + "/grpc"
+		return moduleRoot + "/grpc"
 	case "worker":
-		return moduleRuntime + "/worker"
+		return moduleRoot + "/worker"
 	case "log":
 		return moduleCapRoot + "/log"
 	case "trace":

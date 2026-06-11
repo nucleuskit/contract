@@ -33,10 +33,9 @@ const (
 )
 
 const (
-	moduleRoot       = "anniext.cn/spelens-gud/nucleus"
+	moduleRoot       = "github.com/nucleuskit"
 	moduleBridgeRoot = moduleRoot + "/bridge"
 	moduleCapRoot    = moduleRoot + "/cap"
-	moduleRuntime    = moduleRoot + "/runtime"
 )
 const (
 	configDirName        = "configs" // 配置目录
