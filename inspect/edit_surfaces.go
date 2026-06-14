@@ -21,7 +21,7 @@ func editSurfaces(m manifest.Manifest) EditSurfaces {
 			"docs/**",
 			"test/**",
 		})),
-		Readonly:  choose(m.AI.Readonly, []string{"internal/adapter/http/gen/**", "internal/adapter/grpc/gen/**", "contract/gen/**", "sdk/go/**"}),
+		Readonly:  choose(m.AI.ReadOnly, []string{"internal/adapter/http/gen/**", "internal/adapter/grpc/gen/**", "contract/gen/**", "sdk/go/**"}),
 		Forbidden: choose(m.AI.Forbidden, []string{"configs/*.local.yaml", "bridge/legacy/**"}),
 	}
 }
