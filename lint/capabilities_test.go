@@ -19,7 +19,7 @@ import _ "github.com/nucleuskit/http"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected L004 finding, got %#v", findings)
 	}
@@ -40,7 +40,7 @@ import _ "github.com/nucleuskit/cap/errortracker"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected L004 finding, got %#v", findings)
 	}
@@ -61,7 +61,7 @@ import _ "github.com/nucleuskit/cap/transport"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected L004 finding, got %#v", findings)
 	}
@@ -77,7 +77,7 @@ capabilities:
   - sentinel
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected L004 finding, got %#v", findings)
 	}
@@ -99,7 +99,7 @@ import _ "github.com/nucleuskit/cap/lock"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect L004 finding, got %#v", findings)
 	}
@@ -121,7 +121,7 @@ import _ "github.com/nucleuskit/cap/transport"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect L004 finding, got %#v", findings)
 	}
@@ -143,7 +143,7 @@ import _ "github.com/nucleuskit/cap/discovery"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect L004 finding, got %#v", findings)
 	}
@@ -163,7 +163,7 @@ nucleus:
       provider: noop
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect L004 finding for provider-backed capability, got %#v", findings)
 	}
@@ -183,7 +183,7 @@ nucleus:
       provider: noop
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected L004 finding for provider-only http capability, got %#v", findings)
 	}
@@ -219,7 +219,7 @@ func register(router any, handler httpgen.Handler) {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect L004 finding for generated HTTP binder, got %#v", findings)
 	}

@@ -7,17 +7,8 @@ type Finding struct {
 	Path    string `json:"path,omitempty"`
 }
 
-// Run executes the default Nucleus lint rule set for a service directory.
-func Run(dir string) []Finding {
-	return run(dir, false)
-}
-
-// RunStrict executes the default and strict Nucleus lint rule sets for a service directory.
-func RunStrict(dir string) []Finding {
-	return run(dir, true)
-}
-
-func run(dir string, strict bool) []Finding {
+// Run executes the Nucleus lint rule set for a service directory.
+func Run(dir string, strict bool) []Finding {
 	var findings []Finding
 	findings = append(findings, lintManifest(dir)...)
 	findings = append(findings, lintCoreImports(dir)...)

@@ -19,7 +19,7 @@ service:
   "type": "object"
 }`)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L012") {
 		t.Fatalf("expected L012 finding, got %#v", findings)
 	}
@@ -39,7 +39,7 @@ service:
   "type": "object"
 }`)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L012") {
 		t.Fatalf("did not expect L012 finding, got %#v", findings)
 	}

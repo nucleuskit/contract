@@ -17,7 +17,7 @@ dependencies:
     required: true
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L005") {
 		t.Fatalf("expected L005 finding, got %#v", findings)
 	}
@@ -38,7 +38,7 @@ dependencies:
 paths: {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L005") {
 		t.Fatalf("did not expect L005 finding, got %#v", findings)
 	}
@@ -62,7 +62,7 @@ paths:
       operationId: listPayments
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L005") {
 		t.Fatalf("did not expect L005 finding, got %#v", findings)
 	}
@@ -80,7 +80,7 @@ dependencies:
     required: true
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L005") {
 		t.Fatalf("did not expect L005 finding for remote contract ref, got %#v", findings)
 	}
@@ -98,7 +98,7 @@ dependencies:
     required: true
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L005") {
 		t.Fatalf("expected L005 finding for dependency path escape, got %#v", findings)
 	}
@@ -127,7 +127,7 @@ paths:
       operationId: listPayments
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L005") {
 		t.Fatalf("expected L005 finding for missing fragment, got %#v", findings)
 	}

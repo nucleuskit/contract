@@ -18,7 +18,7 @@ capabilities: []
 import _ "github.com/gin-gonic/gin"
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L003") {
 		t.Fatalf("expected L003 finding, got %#v", findings)
 	}
@@ -40,7 +40,7 @@ import _ "github.com/nucleuskit/bridge/legacy/opentracing"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L007") {
 		t.Fatalf("expected L007 finding, got %#v", findings)
 	}
@@ -59,7 +59,7 @@ capabilities: []
 import (
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L003") {
 		t.Fatalf("expected L003 finding, got %#v", findings)
 	}

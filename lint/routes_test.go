@@ -33,7 +33,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L001") {
 		t.Fatalf("expected L001 finding, got %#v", findings)
 	}
@@ -68,7 +68,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L001") {
 		t.Fatalf("expected L001 finding, got %#v", findings)
 	}
@@ -103,7 +103,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding, got %#v", findings)
 	}
@@ -138,7 +138,7 @@ func TestRoutes() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L001") {
 		t.Fatalf("expected L001 finding when route is only registered in _test.go, got %#v", findings)
 	}
@@ -161,7 +161,7 @@ paths:
 `)
 	writeFile(t, dir, "cmd/demo/main.go", "package main\n\nimport (\n\t\"net/http\"\n\n\truntimehttp \"github.com/nucleuskit/http\"\n)\n\nfunc main() {\n\tserver := runtimehttp.NewServer()\n\tserver.Handle(http.MethodGet, `/healthz`, nil)\n}\n")
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding for raw string route path, got %#v", findings)
 	}
@@ -196,7 +196,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding for escaped string route path, got %#v", findings)
 	}
@@ -243,7 +243,7 @@ func RegisterRoutes(router Router) {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") || hasRule(findings, "L004") {
 		t.Fatalf("did not expect L001 or L004 finding, got %#v", findings)
 	}
@@ -277,7 +277,7 @@ func Configure(widget Widget) {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L001") {
 		t.Fatalf("expected L001 finding for unrelated Handle method, got %#v", findings)
 	}
@@ -315,7 +315,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding, got %#v", findings)
 	}
@@ -354,7 +354,7 @@ func register(server *runtimehttp.Server, handler httpgen.Handler) {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding, got %#v", findings)
 	}
@@ -391,7 +391,7 @@ func main() {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L001") {
 		t.Fatalf("did not expect L001 finding, got %#v", findings)
 	}

@@ -20,7 +20,7 @@ service EmptyService {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L013") {
 		t.Fatalf("expected L013 finding, got %#v", findings)
 	}
@@ -43,7 +43,7 @@ service GreeterService {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L013") {
 		t.Fatalf("did not expect L013 finding, got %#v", findings)
 	}
