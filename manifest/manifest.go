@@ -61,7 +61,7 @@ type Dependency struct {
 type AI struct {
 	Intent         string   `yaml:"intent" json:"intent,omitempty"`                   // Intent
 	AllowedChanges []string `yaml:"allowed_changes" json:"allowed_changes,omitempty"` // Allowed Changes
-	ReadOnly       []string `yaml:"readonly" json:"readonly,omitempty"`               // Read Only
+	Readonly       []string `yaml:"readonly" json:"readonly,omitempty"`               // Read-only paths
 	Forbidden      []string `yaml:"forbidden" json:"forbidden,omitempty"`             // Forbidden
 	Generated      []string `yaml:"generated" json:"generated,omitempty"`             // Generated
 }
@@ -113,7 +113,7 @@ func ValidateDiagnostics(manifest Manifest) diagnostic.Diagnostics {
 	diagnostics = append(diagnostics, validateDependencies(manifest.Dependencies)...)
 	// edit surface check
 	diagnostics = append(diagnostics, validateEditSurface("ai.allowed_changes", manifest.AI.AllowedChanges)...)
-	diagnostics = append(diagnostics, validateEditSurface("ai.readonly", manifest.AI.ReadOnly)...)
+	diagnostics = append(diagnostics, validateEditSurface("ai.readonly", manifest.AI.Readonly)...)
 	diagnostics = append(diagnostics, validateEditSurface("ai.forbidden", manifest.AI.Forbidden)...)
 	diagnostics = append(diagnostics, validateEditSurface("ai.generated", manifest.AI.Generated)...)
 	return diagnostics
