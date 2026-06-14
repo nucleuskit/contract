@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// readModules 读取go.mod
+// readModules reads go.mod.
 func readModules(path string) []string {
 	file, err := os.Open(path)
 	if err != nil {

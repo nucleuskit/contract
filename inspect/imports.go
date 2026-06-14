@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// ImportGraph 创建导入图
+// ImportGraph creates an import graph.
 func ImportGraph(dir string) ([]string, error) {
 	seen := map[string]bool{}
 	if err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
@@ -39,7 +39,7 @@ func ImportGraph(dir string) ([]string, error) {
 	return imports, nil
 }
 
-// skipPath 跳过路径
+// skipPath skips paths.
 func skipPath(path string) bool {
 	clean := filepath.ToSlash(path)
 	return strings.Contains(clean, skipPathGit) ||

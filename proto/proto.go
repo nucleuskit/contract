@@ -6,6 +6,14 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/nucleuskit/contract/diagnostic"
+)
+
+const (
+	protoDirName        = "api/proto"
+	protoFileExtension  = ".proto"
+	protoSourceBasePath = "api/proto"
 )
 
 // Service 服务
@@ -36,7 +44,7 @@ type HTTPRule struct {
 
 // LoadServices 加载服务
 func LoadServices(dir string) ([]Service, error) {
-	protoDir := filepath.Join(dir, "api", "proto")
+	protoDir := filepath.Join(dir, filepath.FromSlash(protoDirName))
 	entries, err := os.ReadDir(protoDir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -47,7 +55,7 @@ func LoadServices(dir string) ([]Service, error) {
 
 	var services []Service
 	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".proto") {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), protoFileExtension) {
 			continue
 		}
 		path := filepath.Join(protoDir, entry.Name())
@@ -55,7 +63,7 @@ func LoadServices(dir string) ([]Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		source := filepath.ToSlash(filepath.Join("api", "proto", entry.Name()))
+		source := filepath.ToSlash(filepath.Join(protoSourceBasePath, entry.Name()))
 		services = append(services, parseServices(source, string(data))...)
 	}
 	sort.Slice(services, func(i, j int) bool {
@@ -65,6 +73,35 @@ func LoadServices(dir string) ([]Service, error) {
 		return services[i].Source < services[j].Source
 	})
 	return services, nil
+}
+
+// ValidateDir checks api/proto/*.proto files with the package's lightweight parser.
+func ValidateDir(dir string) diagnostic.Diagnostics {
+	protoDir := filepath.Join(dir, filepath.FromSlash(protoDirName))
+	entries, err := os.ReadDir(protoDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return diagnostic.Diagnostics{errorDiagnostic(protoDirName, "proto.read_failed", err.Error())}
+	}
+
+	var diagnostics diagnostic.Diagnostics
+	seenServices := map[string]struct{}{}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), protoFileExtension) {
+			continue
+		}
+		fullPath := filepath.Join(protoDir, entry.Name())
+		data, err := os.ReadFile(fullPath)
+		source := filepath.ToSlash(filepath.Join(protoSourceBasePath, entry.Name()))
+		if err != nil {
+			diagnostics = append(diagnostics, errorDiagnostic(source, "proto.read_failed", err.Error()))
+			continue
+		}
+		diagnostics = append(diagnostics, validateProtoSource(source, string(data), seenServices)...)
+	}
+	return diagnostics
 }
 
 var (
@@ -99,6 +136,75 @@ func parseServices(source string, data string) []Service {
 		services = append(services, service)
 	}
 	return services
+}
+
+func validateProtoSource(source string, data string, seenServices map[string]struct{}) diagnostic.Diagnostics {
+	stripped := lineComment.ReplaceAllString(data, "")
+	pkg := ""
+	if match := packagePattern.FindStringSubmatch(stripped); len(match) == 2 {
+		pkg = match[1]
+	}
+
+	var diagnostics diagnostic.Diagnostics
+	for _, match := range serviceHeaderPattern.FindAllStringSubmatchIndex(stripped, -1) {
+		bodyStart := match[1]
+		bodyEnd := matchingBraceEnd(stripped, bodyStart-1)
+		serviceName := stripped[match[2]:match[3]]
+		if bodyEnd <= bodyStart {
+			diagnostics = append(diagnostics, errorDiagnostic(source, "proto.service_block_unclosed", "service blocks must have a matching closing brace"))
+			continue
+		}
+		serviceKey := pkg + "." + serviceName
+		if _, ok := seenServices[serviceKey]; ok {
+			diagnostics = append(diagnostics, errorDiagnostic(source, "proto.service_duplicate", "service names must be unique within a package"))
+		}
+		seenServices[serviceKey] = struct{}{}
+		body := stripped[bodyStart:bodyEnd]
+		diagnostics = append(diagnostics, validateRPCDeclarations(source, body)...)
+		if strings.Contains(body, "google.api.http") && len(parseHTTPRules(body)) == 0 {
+			diagnostics = append(diagnostics, errorDiagnostic(source, "proto.http_rule_invalid", "google.api.http options must include a supported HTTP verb"))
+		}
+	}
+	return diagnostics
+}
+
+func validateRPCDeclarations(source string, body string) diagnostic.Diagnostics {
+	var diagnostics diagnostic.Diagnostics
+	blockRanges := serviceMethodBlockRanges(body)
+	rpcPattern := regexp.MustCompile(`\brpc\s+([A-Za-z_][A-Za-z0-9_]*)`)
+	for _, match := range rpcPattern.FindAllStringIndex(body, -1) {
+		if validRPCAt(body, match[0]) || withinAny(match[0], blockRanges) {
+			continue
+		}
+		diagnostics = append(diagnostics, errorDiagnostic(source, "proto.rpc_invalid", "rpc declarations must include request and response types"))
+	}
+	return diagnostics
+}
+
+func serviceMethodBlockRanges(body string) [][2]int {
+	var blockRanges [][2]int
+	for _, match := range methodBlockHeader.FindAllStringSubmatchIndex(body, -1) {
+		bodyStart := match[1]
+		bodyEnd := matchingBraceEnd(body, bodyStart-1)
+		if bodyEnd > bodyStart {
+			blockRanges = append(blockRanges, [2]int{match[0], bodyEnd + 1})
+		}
+	}
+	return blockRanges
+}
+
+func validRPCAt(body string, position int) bool {
+	for _, match := range methodPattern.FindAllStringIndex(body, -1) {
+		if match[0] == position {
+			return true
+		}
+	}
+	for _, match := range methodBlockHeader.FindAllStringIndex(body, -1) {
+		if match[0] == position {
+			return true
+		}
+	}
+	return false
 }
 
 // methodDecl 方法声明
@@ -296,4 +402,13 @@ func parseHTTPRuleBody(ruleBody string) (HTTPRule, bool) {
 		rule.ResponseBody = responseBodyMatch[1]
 	}
 	return rule, true
+}
+
+func errorDiagnostic(path string, code string, message string) diagnostic.Diagnostic {
+	return diagnostic.Diagnostic{
+		Severity: diagnostic.SeverityError,
+		Code:     code,
+		Path:     path,
+		Message:  message,
+	}
 }

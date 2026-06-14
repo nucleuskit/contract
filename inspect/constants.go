@@ -38,7 +38,7 @@ const (
 	moduleCapRoot    = moduleRoot + "/cap"
 )
 const (
-	configDirName        = "configs" // 配置目录
+	configDirName        = "configs" // Config directory
 	configLocalNamePart  = "local"
 	configSecretNamePart = "secret"
 	configYAMLExtension  = ".yaml"
@@ -123,16 +123,16 @@ const (
 )
 
 const (
-	selectorRegisterRoutes    = "RegisterRoutes"    // 注册路由
-	selectorHandle            = "Handle"            // 处理请求
-	selectorRegisterWellKnown = "RegisterWellKnown" // 注册 Well-Known
-	selectorHTTPClientDo      = "Do"                // 执行 HTTP 请求
-	selectorLogDebug          = "Debug"             // 调试日志
-	selectorLogInfo           = "Info"              // 信息日志
-	selectorLogWarn           = "Warn"              // 警告日志
-	selectorLogError          = "Error"             // 错误日志
+	selectorRegisterRoutes    = "RegisterRoutes"    // Register routes
+	selectorHandle            = "Handle"            // Handle requests
+	selectorRegisterWellKnown = "RegisterWellKnown" // Register Well-Known
+	selectorHTTPClientDo      = "Do"                // Execute HTTP request
+	selectorLogDebug          = "Debug"             // Debug log
+	selectorLogInfo           = "Info"              // Info log
+	selectorLogWarn           = "Warn"              // Warning log
+	selectorLogError          = "Error"             // Error log
 
-	identifierHTTP        = "http" // http包名
+	identifierHTTP        = "http" // http package name
 	identifierBlankImport = "_"    //
 	identifierDotImport   = "."
 )
