@@ -3,9 +3,11 @@ package openapi
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/nucleuskit/contract/diagnostic"
 	"go.yaml.in/yaml/v3"
 )
 
@@ -106,6 +108,7 @@ func LoadRouteRegistry(dir string) ([]Route, error) {
 	return routes, nil
 }
 
+// operations returns the operations for the path item.
 func (item routePathItem) operations() map[string]routeOperation {
 	candidates := map[string]*routeOperation{
 		methodGet:     item.Get,
@@ -125,6 +128,7 @@ func (item routePathItem) operations() map[string]routeOperation {
 	return operations
 }
 
+// convertParameters converts routeParameters to Parameters.
 func convertParameters(parameters []routeParameter) []Parameter {
 	converted := make([]Parameter, 0, len(parameters))
 	for _, parameter := range parameters {
@@ -136,4 +140,89 @@ func convertParameters(parameters []routeParameter) []Parameter {
 		})
 	}
 	return converted
+}
+
+var pathParameterPattern = regexp.MustCompile(`\{([^}/]+)\}`)
+
+// ValidateDir checks api/openapi.yaml when an OpenAPI contract is present.
+func ValidateDir(dir string) diagnostic.Diagnostics {
+	path := filepath.Join(dir, apiDirName, openAPIFileName)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return diagnostic.Diagnostics{errorDiagnostic("openapi.read_failed", err.Error())}
+	}
+
+	var doc routeDocument
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		return diagnostic.Diagnostics{errorDiagnostic("openapi.parse_failed", "parse api/openapi.yaml: "+err.Error())}
+	}
+	if len(doc.Paths) == 0 {
+		return diagnostic.Diagnostics{errorDiagnostic("openapi.paths_required", "paths must contain at least one operation")}
+	}
+
+	var diagnostics diagnostic.Diagnostics
+	operationIDs := map[string]struct{}{}
+	for pathValue, item := range doc.Paths {
+		pathParameters := convertParameters(item.Parameters)
+		operations := item.operations()
+		if len(operations) == 0 {
+			diagnostics = append(diagnostics, errorDiagnostic("openapi.operation_required", "path entries must define at least one operation"))
+			continue
+		}
+		for _, operation := range operations {
+			operationID := strings.TrimSpace(operation.OperationID)
+			if operationID == "" {
+				diagnostics = append(diagnostics, errorDiagnostic("openapi.operation_id_required", "operationId is required"))
+			}
+			if _, ok := operationIDs[operationID]; operationID != "" && ok {
+				diagnostics = append(diagnostics, errorDiagnostic("openapi.operation_id_duplicate", "operationId values must be unique"))
+			}
+			if operationID != "" {
+				operationIDs[operationID] = struct{}{}
+			}
+			parameters := append([]Parameter{}, pathParameters...)
+			parameters = append(parameters, convertParameters(operation.Parameters)...)
+			for _, parameterName := range pathParameterNames(pathValue) {
+				if !hasRequiredPathParameter(parameterName, parameters) {
+					diagnostics = append(diagnostics, errorDiagnostic("openapi.path_parameter_missing", "path parameters must have matching required in: path parameters"))
+				}
+			}
+			if len(operation.Responses) == 0 {
+				diagnostics = append(diagnostics, errorDiagnostic("openapi.responses_required", "operations must define at least one response"))
+			}
+		}
+	}
+	return diagnostics
+}
+
+func pathParameterNames(pathValue string) []string {
+	matches := pathParameterPattern.FindAllStringSubmatch(pathValue, -1)
+	names := make([]string, 0, len(matches))
+	for _, match := range matches {
+		if len(match) == 2 {
+			names = append(names, match[1])
+		}
+	}
+	return names
+}
+
+func hasRequiredPathParameter(name string, parameters []Parameter) bool {
+	for _, parameter := range parameters {
+		if strings.TrimSpace(parameter.Name) == name && strings.TrimSpace(parameter.In) == "path" && parameter.Required {
+			return true
+		}
+	}
+	return false
+}
+
+func errorDiagnostic(code string, message string) diagnostic.Diagnostic {
+	return diagnostic.Diagnostic{
+		Severity: diagnostic.SeverityError,
+		Code:     code,
+		Path:     "api/openapi.yaml",
+		Message:  message,
+	}
 }
