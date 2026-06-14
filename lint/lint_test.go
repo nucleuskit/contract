@@ -27,13 +27,13 @@ import _ "github.com/nucleuskit/http"
 func main() {}
 `)
 
-	findings := Run(dir)
+	findings := Run(dir, false)
 	if hasRule(findings, "L004") {
 		t.Fatalf("did not expect default lint to run strict-only L004, got %#v", findings)
 	}
 }
 
-func TestRunStrictIncludesStrictOnlyRules(t *testing.T) {
+func TestRunIncludesStrictOnlyRulesWhenStrict(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "nucleus.yaml", `schema_version: "1.0"
 service:
@@ -48,7 +48,7 @@ import _ "github.com/nucleuskit/http"
 func main() {}
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L004") {
 		t.Fatalf("expected strict lint to run L004, got %#v", findings)
 	}
@@ -66,7 +66,6 @@ func TestLintPublicAPIsHaveGoDoc(t *testing.T) {
 	required := map[string]bool{
 		"Finding":    true,
 		"Run":        true,
-		"RunStrict":  true,
 		"UsesImport": true,
 	}
 	seen := map[string]bool{}

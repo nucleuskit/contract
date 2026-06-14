@@ -22,7 +22,7 @@ ai:
 `)
 	writeFile(t, dir, "contract/gen/.nucleus-source.sha256", "stale")
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L010") {
 		t.Fatalf("expected L010 finding, got %#v", findings)
 	}
@@ -52,7 +52,7 @@ ai:
 		t.Fatal(err)
 	}
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L010") {
 		t.Fatalf("expected L010 finding for generated target path escape, got %#v", findings)
 	}

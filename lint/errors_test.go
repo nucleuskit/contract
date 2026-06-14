@@ -29,7 +29,7 @@ func getOrder() error {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L002") {
 		t.Fatalf("expected L002 finding, got %#v", findings)
 	}
@@ -63,7 +63,7 @@ func getOrder() error {
 }
 `)
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L002") {
 		t.Fatalf("did not expect L002 finding, got %#v", findings)
 	}

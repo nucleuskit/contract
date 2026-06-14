@@ -7,6 +7,7 @@ type Finding struct {
 	Path    string `json:"path,omitempty"`
 }
 
+// Run executes the Nucleus lint rule set for a service directory.
 func Run(dir string, strict bool) []Finding {
 	var findings []Finding
 	findings = append(findings, lintManifest(dir)...)

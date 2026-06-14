@@ -19,7 +19,7 @@ capabilities: []
 	writeFile(t, dir, "api/errors.yaml", "errors: []\n")
 	writeFile(t, dir, "internal/alerts/service.go", "package alerts\n")
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L011") {
 		t.Fatalf("expected AGENTS.md top-level registry to allow business service dirs, got %#v", findings)
 	}
@@ -40,7 +40,7 @@ capabilities: []
 		}
 	}
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if !hasRule(findings, "L011") {
 		t.Fatalf("expected AGENTS.md top-level registry to enforce L011, got %#v", findings)
 	}
@@ -59,7 +59,7 @@ capabilities: []
 		t.Fatal(err)
 	}
 
-	findings := RunStrict(dir)
+	findings := Run(dir, true)
 	if hasRule(findings, "L011") {
 		t.Fatalf("expected L011 to stay disabled without an AGENTS.md registry section, got %#v", findings)
 	}
