@@ -2,6 +2,15 @@ package inspect
 
 import "github.com/nucleuskit/contract/manifest"
 
+// GeneratedFreshnessForDir loads a service manifest and reports generated target freshness.
+func GeneratedFreshnessForDir(dir string) ([]GeneratedFreshness, error) {
+	m, err := manifest.Load(dir)
+	if err != nil {
+		return nil, err
+	}
+	return freshness(dir, m), nil
+}
+
 func freshness(dir string, m manifest.Manifest) []GeneratedFreshness {
 	if len(m.AI.Generated) == 0 {
 		return nil

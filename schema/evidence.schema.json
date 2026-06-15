@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nucleuskit.dev/contract/schema/evidence.schema.json",
+  "title": "Nucleus Verification Evidence",
+  "type": "object",
+  "x-nucleus-schema-version": "verify.v1",
+  "required": ["result_kind", "schema_version", "schema_ref", "ok", "summary", "steps", "diagnostics", "findings"],
+  "additionalProperties": true,
+  "properties": {
+    "result_kind": {
+      "const": "nucleus.verify_result"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "schema_ref": {
+      "const": "contract/schema/evidence.schema.json"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["steps", "passed", "failed", "errors", "warnings", "lint_findings"],
+      "additionalProperties": false,
+      "properties": {
+        "steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lint_findings": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "diagnostics": {
+      "type": "array"
+    },
+    "findings": {
+      "type": "array"
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["id", "sequence", "phase", "command", "working_dir", "schema_ref", "produces", "status", "ok", "exit_code"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "phase": {
+          "enum": ["validate", "lint", "generated_freshness", "tidy", "import", "build", "test"]
+        },
+        "command": {
+          "type": "string"
+        },
+        "working_dir": {
+          "type": "string"
+        },
+        "schema_ref": {
+          "const": "contract/schema/evidence.schema.json"
+        },
+        "produces": {
+          "const": "nucleus.verify_result"
+        },
+        "status": {
+          "enum": ["passed", "failed"]
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "output": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        },
+        "changed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generated_freshness": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/generated_freshness"
+          }
+        }
+      }
+    },
+    "generated_freshness": {
+      "type": "object",
+      "required": ["source", "target", "fresh"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "source_hash": {
+          "type": "string"
+        },
+        "target_hash": {
+          "type": "string"
+        },
+        "fresh": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
