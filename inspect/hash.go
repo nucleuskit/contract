@@ -14,11 +14,15 @@ import (
 const FreshnessMarker = ".nucleus-source.sha256"
 
 func ContractSourceHash(dir string) (string, error) {
-	paths := []string{
-		filepath.Join(dir, filepath.FromSlash(contractPathOpenAPI)),
-		filepath.Join(dir, filepath.FromSlash(contractPathErrors)),
+	root, err := filepath.Abs(filepath.Clean(dir))
+	if err != nil {
+		return "", err
 	}
-	protoDir := filepath.Join(dir, filepath.FromSlash(contractProtoDir))
+	paths := []string{
+		filepath.Join(root, filepath.FromSlash(contractPathOpenAPI)),
+		filepath.Join(root, filepath.FromSlash(contractPathErrors)),
+	}
+	protoDir := filepath.Join(root, filepath.FromSlash(contractProtoDir))
 	if entries, err := os.ReadDir(protoDir); err == nil {
 		for _, entry := range entries {
 			if !entry.IsDir() && strings.HasSuffix(entry.Name(), contractProtoFileSuffix) {
@@ -39,7 +43,12 @@ func ContractSourceHash(dir string) (string, error) {
 			return "", err
 		}
 		found = true
-		_, _ = io.WriteString(hash, filepath.ToSlash(strings.TrimPrefix(path, dir)))
+		relative, err := filepath.Rel(root, path)
+		if err != nil {
+			_ = file.Close()
+			return "", err
+		}
+		_, _ = io.WriteString(hash, filepath.ToSlash(relative))
 		if _, err := io.Copy(hash, file); err != nil {
 			_ = file.Close()
 			return "", err

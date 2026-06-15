@@ -23,9 +23,9 @@ const (
 )
 
 const (
-	commandValidate = "nucleus validate --dir ."
-	commandLint     = "nucleus lint --dir ."
-	commandGoTest   = "go test ./..."
+	commandValidate   = "nucleus validate --dir ."
+	commandLintStrict = "nucleus lint --dir . --strict"
+	commandVerifyJSON = "nucleus verify --dir . --json"
 )
 const (
 	capabilitySQL   = "sql"
@@ -112,6 +112,7 @@ const (
 const (
 	generatedFreshnessReasonMissingMarker = "missing freshness marker"
 	generatedFreshnessReasonHashDiffers   = "source hash differs from generated marker"
+	generatedFreshnessReasonInvalidTarget = "generated target must be a relative path inside the service directory"
 )
 const (
 	goSourceExtension     = ".go"
