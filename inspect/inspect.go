@@ -60,8 +60,8 @@ func defaultVerification() Verification {
 	return Verification{
 		Commands: []string{
 			commandValidate,
-			commandLint,
-			commandGoTest,
+			commandLintStrict,
+			commandVerifyJSON,
 		},
 	}
 }
