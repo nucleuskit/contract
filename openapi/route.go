@@ -30,7 +30,8 @@ type Parameter struct {
 }
 
 type routeDocument struct {
-	Paths map[string]routePathItem `yaml:"paths"`
+	Paths      map[string]routePathItem `yaml:"paths"`
+	Components schemaComponents         `yaml:"components"`
 }
 
 type routePathItem struct {
@@ -53,18 +54,19 @@ type routeOperation struct {
 }
 
 type routeParameter struct {
-	Name     string      `yaml:"name"`
-	In       string      `yaml:"in"`
-	Required bool        `yaml:"required"`
-	Schema   routeSchema `yaml:"schema"`
-}
-
-type routeSchema struct {
-	Type string `yaml:"type"`
+	Name     string `yaml:"name"`
+	In       string `yaml:"in"`
+	Required bool   `yaml:"required"`
+	Schema   Schema `yaml:"schema"`
 }
 
 type routeRequestBody struct {
-	Required bool `yaml:"required"`
+	Required bool                      `yaml:"required"`
+	Content  map[string]routeMediaType `yaml:"content"`
+}
+
+type routeMediaType struct {
+	Schema Schema `yaml:"schema"`
 }
 
 // LoadRouteRegistry loads HTTP routes from api/openapi.yaml.
