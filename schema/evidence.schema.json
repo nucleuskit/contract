@@ -1,70 +1,144 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://nucleuskit.dev/contract/schema/evidence.schema.json",
-  "title": "Nucleus Verification Evidence",
-  "type": "object",
-  "x-nucleus-schema-version": "verify.v1",
-  "required": ["result_kind", "schema_version", "schema_ref", "ok", "summary", "steps", "diagnostics", "findings"],
-  "additionalProperties": true,
-  "properties": {
-    "result_kind": {
-      "const": "nucleus.verify_result"
+  "title": "Nucleus Evidence",
+  "x-nucleus-schema-version": "evidence.v1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/verify_result"
     },
-    "schema_version": {
-      "type": "string"
-    },
-    "schema_ref": {
-      "const": "contract/schema/evidence.schema.json"
-    },
-    "ok": {
-      "type": "boolean"
-    },
-    "summary": {
+    {
+      "$ref": "#/$defs/execution_evidence"
+    }
+  ],
+  "$defs": {
+    "verify_result": {
       "type": "object",
-      "required": ["steps", "passed", "failed", "errors", "warnings", "lint_findings"],
-      "additionalProperties": false,
+      "required": ["result_kind", "schema_version", "schema_ref", "ok", "summary", "steps", "diagnostics", "findings"],
+      "additionalProperties": true,
       "properties": {
+        "result_kind": {
+          "const": "nucleus.verify_result"
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "schema_ref": {
+          "const": "contract/schema/evidence.schema.json"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "object",
+          "required": ["steps", "passed", "failed", "errors", "warnings", "lint_findings"],
+          "additionalProperties": false,
+          "properties": {
+            "steps": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "passed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "errors": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "warnings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "lint_findings": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
         "steps": {
-          "type": "integer",
-          "minimum": 0
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/verify_step"
+          }
         },
-        "passed": {
-          "type": "integer",
-          "minimum": 0
+        "diagnostics": {
+          "type": "array"
         },
-        "failed": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "errors": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "warnings": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "lint_findings": {
-          "type": "integer",
-          "minimum": 0
+        "findings": {
+          "type": "array"
         }
       }
     },
-    "steps": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/step"
+    "execution_evidence": {
+      "type": "object",
+      "required": ["schema_version", "kind", "pass", "status", "steps"],
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "nucleus.http_scenario_evidence"
+              }
+            },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["schema_ref", "assertion_results", "redaction_applied", "executed_by_package"]
+          }
+        }
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "evidence.v1"
+        },
+        "schema_ref": {
+          "const": "contract/schema/evidence.schema.json"
+        },
+        "kind": {
+          "enum": ["nucleus.apply_evidence", "nucleus.executor_evidence", "nucleus.http_scenario_evidence"]
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": ["passed", "failed", "timeout", "blocked", "needs_manual_action"]
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "http_samples": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "assertion_results": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "redaction_applied": {
+          "type": "boolean"
+        },
+        "redaction_policy": {
+          "type": "object"
+        },
+        "executed_by_package": {
+          "type": "string"
+        }
       }
     },
-    "diagnostics": {
-      "type": "array"
-    },
-    "findings": {
-      "type": "array"
-    }
-  },
-  "$defs": {
-    "step": {
+    "verify_step": {
       "type": "object",
       "required": ["id", "sequence", "phase", "command", "working_dir", "schema_ref", "produces", "status", "ok", "exit_code"],
       "additionalProperties": true,
