@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nucleuskit.dev/contract/schema/migrate.schema.json",
+  "title": "Nucleus Migrate Result",
+  "x-nucleus-schema-version": "migrate.v1",
+  "type": "object",
+  "required": [
+    "result_kind",
+    "schema_version",
+    "schema_ref",
+    "ok",
+    "mode",
+    "summary",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "result_kind": {
+      "const": "nucleus.migrate_result"
+    },
+    "schema_version": {
+      "const": "migrate.v1"
+    },
+    "schema_ref": {
+      "const": "contract/schema/migrate.schema.json"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": ["plan", "check"]
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    }
+  },
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "required": [
+        "from_version",
+        "to_version",
+        "compatibility",
+        "steps",
+        "required_edits",
+        "advisory_edits",
+        "checks",
+        "commands",
+        "errors",
+        "warnings",
+        "generated_fresh",
+        "contract_surfaces",
+        "capability_count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "from_version": {
+          "type": "string"
+        },
+        "to_version": {
+          "type": "string"
+        },
+        "compatibility": {
+          "enum": ["no_change", "supported", "generic_forward", "unsupported"]
+        },
+        "steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "required_edits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "advisory_edits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "commands": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generated_fresh": {
+          "type": "boolean"
+        },
+        "contract_surfaces": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "service",
+        "scope",
+        "write_policy",
+        "from_version",
+        "to_version",
+        "compatibility",
+        "contract_first",
+        "description_schema",
+        "required_edits",
+        "advisory_edits",
+        "checks",
+        "steps",
+        "commands",
+        "risks",
+        "generated_freshness",
+        "declared_capabilities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "$ref": "#/$defs/service"
+        },
+        "scope": {
+          "const": "local_service"
+        },
+        "write_policy": {
+          "const": "report_only"
+        },
+        "from_version": {
+          "$ref": "#/$defs/version"
+        },
+        "to_version": {
+          "$ref": "#/$defs/version"
+        },
+        "compatibility": {
+          "enum": ["no_change", "supported", "generic_forward", "unsupported"]
+        },
+        "contract_first": {
+          "type": "boolean"
+        },
+        "description_schema": {
+          "type": "string"
+        },
+        "required_edits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edit"
+          }
+        },
+        "advisory_edits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/edit"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/risk"
+          }
+        },
+        "generated_freshness": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/generated_freshness"
+          }
+        },
+        "declared_capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "version": {
+      "type": "object",
+      "required": ["raw", "normalized", "known"],
+      "additionalProperties": false,
+      "properties": {
+        "raw": {
+          "type": "string"
+        },
+        "normalized": {
+          "type": "string"
+        },
+        "known": {
+          "type": "boolean"
+        }
+      }
+    },
+    "edit": {
+      "type": "object",
+      "required": ["path", "kind", "required", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": ["id", "pass", "severity", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "severity": {
+          "enum": ["info", "warning", "error"]
+        },
+        "subject": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "sequence", "title", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "edits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "required": ["phase", "command", "working_dir", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "working_dir": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "required": ["id", "severity", "reason", "mitigation"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": ["info", "warning", "error"]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "mitigation": {
+          "type": "string"
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "required": ["severity", "code", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": ["error", "warning"]
+        },
+        "code": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "generated_freshness": {
+      "type": "object",
+      "required": ["source", "target", "fresh"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "source_hash": {
+          "type": "string"
+        },
+        "target_hash": {
+          "type": "string"
+        },
+        "fresh": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
