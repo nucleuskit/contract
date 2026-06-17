@@ -1,0 +1,823 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nucleuskit.dev/contract/schema/report.schema.json",
+  "title": "Nucleus Report Result",
+  "x-nucleus-schema-version": "report.v1",
+  "type": "object",
+  "required": [
+    "result_kind",
+    "schema_version",
+    "schema_ref",
+    "ok",
+    "mode",
+    "summary",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "result_kind": {
+      "const": "nucleus.report_result"
+    },
+    "schema_version": {
+      "const": "report.v1"
+    },
+    "schema_ref": {
+      "const": "contract/schema/report.schema.json"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": ["ai_quality", "platform_readiness"]
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    },
+    "ai_quality": {
+      "$ref": "#/$defs/ai_quality"
+    },
+    "platform_readiness": {
+      "$ref": "#/$defs/platform_readiness"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "ai_quality"
+          }
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "required": ["ai_quality"],
+        "not": {
+          "required": ["platform_readiness"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "platform_readiness"
+          }
+        },
+        "required": ["mode"]
+      },
+      "then": {
+        "required": ["platform_readiness"],
+        "not": {
+          "required": ["ai_quality"]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scenario_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "real_evidence_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "single_service_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repairable_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "first_pass_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "failure_located_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "repair_success_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "manual_intervention_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "rollback_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "first_pass_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failure_located_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repair_success_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manual_intervention_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rollback_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_event_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_error_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endpoint_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "grpc_service_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generated_fresh": {
+          "type": "boolean"
+        },
+        "readiness_gate_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readiness_gate_passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readiness_gate_failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "risk_gate_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "risk_gate_passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "risk_gate_failed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ai_quality": {
+      "type": "object",
+      "required": [
+        "input_status",
+        "tasks_dir",
+        "task_count",
+        "scenario_task_count",
+        "real_evidence_task_count",
+        "capability_summary",
+        "strategy_summary",
+        "weekly_report"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "input_status": {
+          "enum": ["loaded", "missing", "failed"]
+        },
+        "tasks_dir": {
+          "type": "string"
+        },
+        "task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scenario_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "real_evidence_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "single_service_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repairable_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_coverage_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "first_pass_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "failure_located_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "repair_success_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "manual_intervention_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "rollback_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "first_pass_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failure_located_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repair_success_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manual_intervention_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rollback_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_event_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_error_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_summary": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/capability_summary"
+          }
+        },
+        "strategy_summary": {
+          "$ref": "#/$defs/strategy_summary"
+        },
+        "weekly_report": {
+          "type": "string"
+        }
+      }
+    },
+    "platform_readiness": {
+      "type": "object",
+      "required": [
+        "service",
+        "version",
+        "endpoint_count",
+        "grpc_service_count",
+        "capability_count",
+        "capabilities",
+        "generated_fresh",
+        "generated_freshness",
+        "verification_commands",
+        "platform_mapping",
+        "release_matrix",
+        "platform_upload_payload",
+        "release_dry_run",
+        "readiness_gates",
+        "risk_gates",
+        "provider_strategy",
+        "control_plane_included",
+        "external_sdk_required",
+        "production_bridge_scope"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "endpoint_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "grpc_service_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generated_fresh": {
+          "type": "boolean"
+        },
+        "generated_freshness": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/generated_freshness"
+          }
+        },
+        "verification_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "platform_mapping": {
+          "type": "string"
+        },
+        "release_matrix": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "platform_upload_payload": {
+          "$ref": "#/$defs/platform_upload_payload"
+        },
+        "release_dry_run": {
+          "$ref": "#/$defs/release_dry_run"
+        },
+        "readiness_gates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/readiness_gate"
+          }
+        },
+        "risk_gates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/risk_gate"
+          }
+        },
+        "provider_strategy": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/provider_strategy"
+          }
+        },
+        "control_plane_included": {
+          "type": "boolean"
+        },
+        "external_sdk_required": {
+          "type": "boolean"
+        },
+        "production_bridge_scope": {
+          "type": "string"
+        }
+      }
+    },
+    "strategy_summary": {
+      "type": "object",
+      "required": [
+        "by_task_type",
+        "by_label",
+        "repair_strategy_counts",
+        "failure_type_counts",
+        "manual_action_reason_counts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "by_task_type": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/strategy_bucket"
+          }
+        },
+        "by_label": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/strategy_bucket"
+          }
+        },
+        "repair_strategy_counts": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "failure_type_counts": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "manual_action_reason_counts": {
+          "$ref": "#/$defs/string_count_map"
+        }
+      }
+    },
+    "platform_upload_payload": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "network_required",
+        "service",
+        "capabilities",
+        "endpoints",
+        "grpc_services",
+        "generated_fresh",
+        "verification_commands"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string"
+        },
+        "network_required": {
+          "type": "boolean"
+        },
+        "service": {
+          "$ref": "#/$defs/service"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/endpoint"
+          }
+        },
+        "grpc_services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/grpc_service"
+          }
+        },
+        "generated_fresh": {
+          "type": "boolean"
+        },
+        "verification_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "release_dry_run": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "network_required",
+        "release_matrix",
+        "verification_commands"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string"
+        },
+        "network_required": {
+          "type": "boolean"
+        },
+        "release_matrix": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "env": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["method", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "operation_id": {
+          "type": "string"
+        }
+      }
+    },
+    "grpc_service": {
+      "type": "object",
+      "required": ["name", "source", "methods"],
+      "additionalProperties": false,
+      "properties": {
+        "package": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/grpc_method"
+          }
+        }
+      }
+    },
+    "grpc_method": {
+      "type": "object",
+      "required": ["name", "request", "response"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "request": {
+          "type": "string"
+        },
+        "response": {
+          "type": "string"
+        },
+        "client_streaming": {
+          "type": "boolean"
+        },
+        "server_streaming": {
+          "type": "boolean"
+        },
+        "http_rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/grpc_http_rule"
+          }
+        }
+      }
+    },
+    "grpc_http_rule": {
+      "type": "object",
+      "required": ["method", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "response_body": {
+          "type": "string"
+        }
+      }
+    },
+    "strategy_bucket": {
+      "type": "object",
+      "required": ["task_count", "success_count", "success_rate"],
+      "additionalProperties": false,
+      "properties": {
+        "task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "success_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "success_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "failure_types": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "manual_action_reasons": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "repair_strategy_counts": {
+          "$ref": "#/$defs/string_count_map"
+        }
+      }
+    },
+    "capability_summary": {
+      "type": "object",
+      "required": ["event_count", "error_count"],
+      "additionalProperties": false,
+      "properties": {
+        "event_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "operations": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "providers": {
+          "$ref": "#/$defs/string_count_map"
+        },
+        "status_count": {
+          "$ref": "#/$defs/string_count_map"
+        }
+      }
+    },
+    "readiness_gate": {
+      "type": "object",
+      "required": ["id", "pass"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "artifact": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_gate": {
+      "type": "object",
+      "required": ["id", "pass", "severity", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "pass": {
+          "type": "boolean"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "provider_strategy": {
+      "type": "object",
+      "required": ["capability", "sdk_status", "gaps"],
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "sdk_status": {
+          "enum": [
+            "optional_no_provider_detected",
+            "optional_local_provider_detected",
+            "optional_external_provider_detected"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "generated_freshness": {
+      "type": "object",
+      "required": ["source", "target", "fresh"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "source_hash": {
+          "type": "string"
+        },
+        "target_hash": {
+          "type": "string"
+        },
+        "fresh": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "required": ["severity", "code", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": ["error", "warning"]
+        },
+        "code": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "string_count_map": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  }
+}
