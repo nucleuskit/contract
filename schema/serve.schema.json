@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nucleuskit.dev/contract/schema/serve.schema.json",
+  "title": "Nucleus Serve Result",
+  "x-nucleus-schema-version": "serve.v1",
+  "type": "object",
+  "required": [
+    "result_kind",
+    "schema_version",
+    "schema_ref",
+    "ok",
+    "mode",
+    "summary",
+    "diagnostics",
+    "server"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "result_kind": {
+      "const": "nucleus.serve_result"
+    },
+    "schema_version": {
+      "const": "serve.v1"
+    },
+    "schema_ref": {
+      "const": "contract/schema/serve.schema.json"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": ["serve", "check"]
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    },
+    "server": {
+      "$ref": "#/$defs/server"
+    }
+  },
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "required": [
+        "status",
+        "addr",
+        "served_paths",
+        "endpoint_count",
+        "grpc_service_count",
+        "capability_count",
+        "generated_fresh",
+        "errors",
+        "warnings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": ["ready", "failed"]
+        },
+        "service": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "addr": {
+          "type": "string"
+        },
+        "served_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endpoint_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "grpc_service_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capability_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generated_fresh": {
+          "type": "boolean"
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "required": ["listening", "network_scope", "metadata_endpoints"],
+      "additionalProperties": false,
+      "properties": {
+        "listening": {
+          "type": "boolean"
+        },
+        "network_scope": {
+          "enum": ["loopback", "non_local", "invalid"]
+        },
+        "metadata_endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metadata_endpoint"
+          }
+        }
+      }
+    },
+    "metadata_endpoint": {
+      "type": "object",
+      "required": ["method", "path", "content_type"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "GET"
+        },
+        "path": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "required": ["severity", "code", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": ["error", "warning", "info"]
+        },
+        "code": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
